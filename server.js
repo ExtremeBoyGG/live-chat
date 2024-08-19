@@ -16,7 +16,7 @@ io.on('connection', (socket)=> {
         nickname = name;
         socket.broadcast.emit('join', nickname);
     });
-    
+
     socket.on('message', (message) => {
         console.log("PESAN")
         io.emit('message', {nickname,message})
@@ -27,6 +27,6 @@ io.on('connection', (socket)=> {
         }
     });
 })
-server.listen(300,() => {
+server.listen(3000,() => {
     console.log('listening on port 3000')
 })
