@@ -1,4 +1,4 @@
-const socket = io("https://extremeboy-live-chaat.vercel.app");
+const socket = io();
 
 document.getElementById('nickname-button').addEventListener('click', () => {
     const nickname = document.getElementById('nickname-input').value;
