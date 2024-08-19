@@ -12,17 +12,20 @@ io.on('connection', (socket)=> {
     console.log("TESSSSSs")
     let nickname;
 
-    socket.on('join',(name)=> {
-        nickname=name;
-        console.log(`${nickname} join the chat`);
-    })
+     socket.on('join', (name) => {
+        nickname = name;
+        socket.broadcast.emit('join', nickname);
+    });
+    
     socket.on('message', (message) => {
         console.log("PESAN")
         io.emit('message', {nickname,message})
     })
     socket.on('disconnect', () => {
-        console.log(`${nickname} has left the chat`)
-    })
+        if (nickname) {
+            socket.broadcast.emit('leave', nickname);
+        }
+    });
 })
 server.listen(300,() => {
     console.log('listening on port 3000')

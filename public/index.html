@@ -1,20 +1,29 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uji Coba Live Chat</title>
-    <link rel="stylesheet" href="styles.css"> 
+    <title>Live Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div id="nickname-container">
-        <input type="text" id="nickname-input" placeholder="Masukkan Nama Anda">
-        <button id="nickname-button">Join Chat</button>
+<body class="bg-gray-100 h-screen flex justify-center items-center">
+    <div id="nickname-container" class="flex flex-col items-center">
+        <select id="server-select" class="mb-4 p-2 border rounded w-64">
+            <option value="server1">Server 1</option>
+            <option value="server2">Server 2</option>
+            <option value="server3">Server 3</option>
+        </select>
+        <input type="text" id="nickname-input" placeholder="Enter your nickname" class="mb-4 p-2 border rounded w-64">
+        <button id="nickname-button" class="px-4 py-2 bg-blue-500 text-white rounded">Join Chat</button>
     </div>
-    <div id="chat-container" style="display:none">
-        <div id="messages"></div>
-        <input type="text" id="message-input" placeholder="Masukkan Pesan">
-        <button id="send-button">Kirim</button>
+    <div id="chat-container" class="hidden flex flex-col items-center w-full max-w-md bg-white shadow-lg rounded-lg p-4">
+        <div id="messages" class="flex flex-col space-y-2 w-full h-64 overflow-y-auto"></div>
+        <div class="flex mt-4 w-full">
+            <input type="text" id="message-input" placeholder="Type a message" class="flex-1 p-2 border rounded-l">
+            <button id="send-button" class="px-4 py-2 bg-blue-500 text-white rounded-r">Send</button>
+        </div>
     </div>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script src="script.js"></script>
 </body>
+</html>
