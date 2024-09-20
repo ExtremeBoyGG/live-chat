@@ -33,7 +33,8 @@ app.get('/', (req, res) => {
 function fetchPreviousMessages(callback) {
     db.all('SELECT * FROM messages ORDER BY timestamp ASC', [], (err, rows) => {
         if (err) {
-            throw err;
+            console.error(err); // Log error
+            return;
         }
         callback(rows);
     });
@@ -44,7 +45,7 @@ function saveMessage(nickname, message) {
     const timestamp = new Date().toISOString(); // Simpan dalam format UTC
     db.run('INSERT INTO messages (nickname, message, timestamp) VALUES (?, ?, ?)', [nickname, message, timestamp], (err) => {
         if (err) {
-            throw err;
+            console.error(err); // Log error
         }
     });
 }
@@ -60,6 +61,7 @@ io.on('connection', (socket) => {
         activeUsers[socket.id] = nickname;
 
         // Notify the user that they successfully joined
+        console.log(`${nickname} has joined the chat.`);
         socket.emit('joinSuccess', nickname);
 
         // Send previous messages
@@ -84,6 +86,7 @@ io.on('connection', (socket) => {
         const nickname = activeUsers[socket.id];
         if (nickname) {
             delete activeUsers[socket.id];
+            console.log(`${nickname} has left the chat.`);
             socket.broadcast.emit('leave', nickname);
         }
     });

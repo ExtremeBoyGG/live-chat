@@ -39,41 +39,7 @@ document.getElementById('message-input').addEventListener('keydown', (event) => 
 });
 
 socket.on('message', (data) => {
-    const messages = document.getElementById('messages');
-    const messageContainer = document.createElement('div');
-    const messageElement = document.createElement('div');
-    const nameElement = document.createElement('div');
-    const timestampElement = document.createElement('div');
-
-    const isOwnMessage = data.nickname === document.getElementById('nickname-input').value;
-
-    nameElement.textContent = data.nickname;
-    nameElement.className = 'text-xs text-gray-500';
-
-    messageElement.textContent = data.message;
-    messageElement.className = `
-        inline-block p-2 rounded-lg max-w-xs
-        ${isOwnMessage ? 'bg-blue-500 text-white self-end' : 'bg-gray-300 self-start'}
-    `;
-
-    // Mengonversi waktu dari UTC ke WIB
-    const localTimestamp = new Date(data.timestamp).toLocaleString('id-ID', {
-        timeZone: 'Asia/Jakarta',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-    });
-
-    timestampElement.textContent = `${localTimestamp} WIB`;
-    timestampElement.className = 'text-xs text-gray-400';
-
-    messageContainer.appendChild(nameElement);
-    messageContainer.appendChild(messageElement);
-    messageContainer.appendChild(timestampElement);
-    messageContainer.className = `${isOwnMessage ? 'self-end' : 'self-start'} space-y-1`;
-
-    messages.appendChild(messageContainer);
-    messages.scrollTop = messages.scrollHeight;
+    appendMessage(data);
 });
 
 // Notifikasi ketika ada yang bergabung
@@ -91,35 +57,58 @@ socket.on('join', (nickname) => {
 // Handle previous messages when joining
 socket.on('previousMessages', (messages) => {
     messages.forEach((data) => {
-        const messageContainer = document.createElement('div');
-        const messageElement = document.createElement('div');
-        const nameElement = document.createElement('div');
-        const timestampElement = document.createElement('div');
-
-        nameElement.textContent = data.nickname;
-        nameElement.className = 'text-xs text-gray-500';
-
-        messageElement.textContent = data.message;
-        messageElement.className = `
-            inline-block p-2 rounded-lg max-w-xs
-            ${data.nickname === document.getElementById('nickname-input').value ? 'bg-blue-500 text-white self-end' : 'bg-gray-300 self-start'}
-        `;
-
-        // Tampilkan waktu dengan format Indonesia
-        timestampElement.textContent = `${new Date(data.timestamp).toLocaleString('id-ID', {
-            timeZone: 'Asia/Jakarta', // Pastikan kita menggunakan zona waktu Jakarta
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-        })} WIB`;
-        
-        timestampElement.className = 'text-xs text-gray-400';
-
-        messageContainer.appendChild(nameElement);
-        messageContainer.appendChild(messageElement);
-        messageContainer.appendChild(timestampElement);
-        messageContainer.className = `${data.nickname === document.getElementById('nickname-input').value ? 'self-end' : 'self-start'} space-y-1`;
-
-        document.getElementById('messages').appendChild(messageContainer);
+        appendMessage(data);
     });
 });
+
+socket.on('leave', (nickname) => {
+    const messages = document.getElementById('messages');
+    const notificationElement = document.createElement('div');
+
+    notificationElement.textContent = `${nickname} has left the chat`;
+    notificationElement.className = 'text-center text-red-500 text-sm my-2';
+
+    messages.appendChild(notificationElement);
+    messages.scrollTop = messages.scrollHeight;
+});
+
+// Fungsi untuk menambahkan pesan
+function appendMessage(data) {
+    const messages = document.getElementById('messages');
+    const messageContainer = document.createElement('div');
+    const messageElement = document.createElement('div');
+    const nameElement = document.createElement('div');
+    const timestampElement = document.createElement('div');
+
+    const nickname = document.getElementById('nickname-input').value; // Get current nickname
+    const isOwnMessage = data.nickname === nickname;
+
+    nameElement.textContent = data.nickname;
+    nameElement.className = 'text-xs text-gray-500';
+
+    messageElement.textContent = data.message;
+    messageElement.className = `
+        inline-block p-2 rounded-lg max-w-xs
+        ${isOwnMessage ? 'bg-blue-500 text-white self-end' : 'bg-gray-300 self-start'}
+    `;
+
+    // Format tanggal
+    const date = new Date(data.timestamp);
+    const formattedDate = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()} ${date.toLocaleTimeString('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+    })} WIB`;
+
+    timestampElement.textContent = formattedDate;
+    timestampElement.className = 'text-xs text-gray-500 text-right mt-1'; // Right align and add margin top
+
+    messageContainer.appendChild(nameElement);
+    messageContainer.appendChild(messageElement);
+    messageContainer.appendChild(timestampElement);
+    messageContainer.className = `${isOwnMessage ? 'self-end text-right' : 'self-start'} space-y-1`;
+
+    messages.appendChild(messageContainer);
+    messages.scrollTop = messages.scrollHeight;
+}
